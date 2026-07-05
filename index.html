@@ -197,6 +197,10 @@ async function bitableRequest(method, path, body) {
 }
 
 // ====== 云端数据读写 ======
+
+function dateToTimestamp(dateStr) {
+  return new Date(dateStr + 'T00:00:00+08:00').getTime();
+}
 let remoteRecords = {}; // key: "date_taskId" -> { record_id, checked, star, review }
 
 async function syncFromCloud() {
@@ -241,7 +245,7 @@ async function saveCheckToCloud(dateStr, taskId, checked) {
     });
   } else {
     const resp = await bitableRequest('POST', '/records', {
-      fields: { '日期': dateStr, '任务ID': taskId, '已打卡': checked }
+      fields: { '日期': dateToTimestamp(dateStr), '任务ID': taskId, '已打卡': checked }
     });
     if (resp && resp.code === 0) {
       remoteRecords[key] = { record_id: resp.data.record.record_id, checked, star: 0, review: '' };
@@ -259,7 +263,7 @@ async function saveStarToCloud(dateStr, val) {
     });
   } else {
     const resp = await bitableRequest('POST', '/records', {
-      fields: { '日期': dateStr, '任务ID': 'honor_stars', '升星数': val }
+      fields: { '日期': dateToTimestamp(dateStr), '任务ID': 'honor_stars', '升星数': val }
     });
     if (resp && resp.code === 0) {
       remoteRecords[key] = { record_id: resp.data.record.record_id, checked: false, star: val, review: '' };
@@ -277,7 +281,7 @@ async function saveReviewToCloud(dateStr, text) {
     });
   } else {
     const resp = await bitableRequest('POST', '/records', {
-      fields: { '日期': dateStr, '任务ID': 'daily_review', '复盘': text }
+      fields: { '日期': dateToTimestamp(dateStr), '任务ID': 'daily_review', '复盘': text }
     });
     if (resp && resp.code === 0) {
       remoteRecords[key] = { record_id: resp.data.record.record_id, checked: false, star: 0, review: text };
