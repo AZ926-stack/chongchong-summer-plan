@@ -78,13 +78,14 @@ tr.summary-row td.summary-reward { color: #e17055; font-size: 14px; font-weight:
 }
 .snake-popup.show { opacity: 1; }
 .snake-popup .snake-box {
-  background: #fff; border-radius: 16px; padding: 24px 32px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-  text-align: center; transform: scale(0.5); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: linear-gradient(135deg, #e8f8f0, #fff); border: 3px solid #00b894; border-radius: 24px; padding: 28px 36px;
+  box-shadow: 0 12px 40px rgba(0,184,148,0.25);
+  text-align: center; transform: scale(0.5) rotate(-10deg); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.snake-popup.show .snake-box { transform: scale(1); }
-.snake-popup .snake-emoji { font-size: 64px; display: block; margin-bottom: 8px; }
-.snake-popup .snake-text { font-size: 18px; font-weight: 700; color: #00b894; }
+.snake-popup.show .snake-box { transform: scale(1) rotate(0deg); }
+.snake-popup .snake-emoji { font-size: 64px; display: block; margin-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); animation: snakeWiggle 0.6s ease-in-out infinite alternate; }
+@keyframes snakeWiggle { 0% { transform: rotate(-5deg); } 100% { transform: rotate(5deg); } }
+.snake-popup .snake-text { font-size: 18px; font-weight: 700; color: #00b894; margin-top: 4px; }
 
 @media print {
   body { background: #fff; padding: 0; }
@@ -130,7 +131,7 @@ tr.summary-row td.summary-reward { color: #e17055; font-size: 14px; font-weight:
 
 <div class="snake-popup" id="snakePopup">
   <div class="snake-box">
-    <span class="snake-emoji">🐍</span>
+    <span class="snake-emoji"><svg width="80" height="80" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="95" rx="32" ry="12" fill="#2ecc71" opacity="0.3"/><path d="M40 85c0 0 5-30 25-35s35 5 35 20-15 18-25 15-10-15 0-25 20-15 30-5" stroke="#2ecc71" stroke-width="8" stroke-linecap="round" fill="none"/><circle cx="100" cy="40" r="16" fill="#2ecc71"/><circle cx="104" cy="36" r="5" fill="#fff"/><circle cx="106" cy="35" r="2.5" fill="#333"/><path d="M98 46l-6 4M98 46l6 4" stroke="#e74c3c" stroke-width="2" stroke-linecap="round"/></svg></span>
     <div class="snake-text" id="snakeText"></div>
   </div>
 </div>
@@ -147,7 +148,6 @@ const TASKS = [
   { cat: '学习', name: '学习机数学', time: '8:15~9:00', id: 'study_machine' },
   { cat: '学习', name: '英语单词', time: '10:30', id: 'eng_words' },
   { cat: '学习', name: '猫果作业', time: '11:45~12:15', id: 'maoguo' },
-  { cat: '学习', name: '英语课/英语短文', time: '20:30~20:55', id: 'eng_essay' },
   { cat: '学习', name: '周学习总结', time: '周六 18:00', id: 'weekly_summary', saturdayOnly: true },
   { cat: '家务', name: '扫地拖地', time: '周五/六（非爬山日）', id: 'sweep', choreDay: true },
   { cat: '家务', name: '做晚饭', time: '周五/六（非爬山日）', id: 'cook', choreDay: true },
@@ -355,9 +355,9 @@ function getStorage(key) {
 
 const TASK_NAMES = {
   cn_read: '中文阅读', study_machine: '学习机数学', eng_words: '英语单词',
-  eng_essay: '英语课/短文', sweep: '扫地拖地', cook: '做晚饭',
+  maoguo: '猫果作业', sweep: '扫地拖地', cook: '做晚饭',
   wash: '洗内裤/袜子/眼镜', trash: '取包裹/扔垃圾', hiking: '爬山',
-  honor_stars: '王者升星', daily_review: '当天活动总结'
+  honor_stars: '王者升星', daily_review: '当天活动总结', weekly_summary: '周学习总结'
 };
 const SNAKE_MSGS = [
   '哇，冲冲，你又完成了！', '太棒了冲冲！', '冲冲真厉害！',
@@ -534,17 +534,7 @@ function render() {
       }
 
       if (isHiking && !paused) {
-        if (task.id === 'study_machine' || task.id === 'eng_words' || task.id === 'maoguo' || task.id === 'cn_read') {
-          if (task.id === 'study_machine' || task.id === 'cn_read') {
-            totalChecks++;
-            if (checked) checkedCount++;
-            html += '<td>' + cellHTML(key, task.id, checked) + '</td>';
-          } else {
-            html += '<td class="empty"><span class="placeholder">-</span></td>';
-          }
-          return;
-        }
-        if (task.id === 'eng_essay') {
+        if (task.id === 'study_machine' || task.id === 'cn_read') {
           totalChecks++;
           if (checked) checkedCount++;
           html += '<td>' + cellHTML(key, task.id, checked) + '</td>';
