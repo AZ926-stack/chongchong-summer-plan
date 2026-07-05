@@ -70,6 +70,22 @@ tr.summary-row td.summary-reward { color: #e17055; font-size: 14px; font-weight:
 .sync-status.error { color: #e17055; }
 .sync-status.ok { color: #00b894; }
 
+.snake-popup {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; pointer-events: none; opacity: 0;
+  transition: opacity 0.3s;
+}
+.snake-popup.show { opacity: 1; }
+.snake-popup .snake-box {
+  background: #fff; border-radius: 16px; padding: 24px 32px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  text-align: center; transform: scale(0.5); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.snake-popup.show .snake-box { transform: scale(1); }
+.snake-popup .snake-emoji { font-size: 64px; display: block; margin-bottom: 8px; }
+.snake-popup .snake-text { font-size: 18px; font-weight: 700; color: #00b894; }
+
 @media print {
   body { background: #fff; padding: 0; }
   .week-nav button { display: none; }
@@ -112,6 +128,12 @@ tr.summary-row td.summary-reward { color: #e17055; font-size: 14px; font-weight:
 
 <div class="sync-status" id="syncStatus">云同步已就绪</div>
 
+<div class="snake-popup" id="snakePopup">
+  <div class="snake-box">
+    <span class="snake-emoji">🐍</span>
+    <div class="snake-text" id="snakeText"></div>
+  </div>
+</div>
 <script>
 // ====== 飞书配置 ======
 const FEISHU_APP_ID = 'cli_aac0f594aef85bfc';
@@ -331,12 +353,36 @@ function getStorage(key) {
   return localStorage.getItem('chk_' + key) === '1';
 }
 
+const TASK_NAMES = {
+  cn_read: '中文阅读', study_machine: '学习机数学', eng_words: '英语单词',
+  eng_essay: '英语课/短文', sweep: '扫地拖地', cook: '做晚饭',
+  wash: '洗内裤/袜子/眼镜', trash: '取包裹/扔垃圾', hiking: '爬山',
+  honor_stars: '王者升星', daily_review: '当天活动总结'
+};
+const SNAKE_MSGS = [
+  '哇，冲冲，你又完成了！', '太棒了冲冲！', '冲冲真厉害！',
+  '继续保持！', '冲冲加油！', '冲冲好样的！',
+  '蛇蛇为你骄傲！', '冲冲太强了！', '冲冲冲！'
+];
+let snakeTimer = null;
+function showSnake(taskId) {
+  const popup = document.getElementById('snakePopup');
+  const text = document.getElementById('snakeText');
+  const name = TASK_NAMES[taskId] || '任务';
+  const msg = SNAKE_MSGS[Math.floor(Math.random() * SNAKE_MSGS.length)];
+  text.textContent = name + ' — ' + msg;
+  popup.classList.add('show');
+  clearTimeout(snakeTimer);
+  snakeTimer = setTimeout(() => popup.classList.remove('show'), 2200);
+}
+
 function toggleCheck(dateStr, taskId) {
   const key = dateStr + '_' + taskId;
   const newVal = !getStorage(key);
   localStorage.setItem('chk_' + key, newVal ? '1' : '0');
   render();
   saveCheckToCloud(dateStr, taskId, newVal);
+  if (newVal) showSnake(taskId);
 }
 
 function togglePause(dateStr) {
