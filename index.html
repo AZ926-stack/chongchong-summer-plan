@@ -172,8 +172,9 @@ const BITABLE_TABLE_ID = 'tblkF5TsalA70tGp';
 const TASKS = [
   { cat: '学习', name: '中文阅读', time: '7:40', id: 'cn_read' },
   { cat: '学习', name: '学习机数学', time: '8:15~9:00', id: 'study_machine' },
-  { cat: '学习', name: '英语句子×2', time: '10:30', id: 'eng_words' },
-  { cat: '学习', name: '猫果作业', time: '11:45~12:15', id: 'maoguo' },
+  { cat: '学习', name: 'RAZ英语阅读', time: '9:30', id: 'raz_reading' },
+  { cat: '学习', name: '英语短句×2', time: '10:30', id: 'eng_words' },
+  { cat: '学习', name: '猫果作业（数学、文综、理综）', time: '11:45', id: 'maoguo' },
   { cat: '学习', name: '周学习总结', time: '周六 18:00', id: 'weekly_summary', saturdayOnly: true },
   { cat: '家务', name: '扫地拖地', time: '周五/六（非爬山日）', id: 'sweep', choreDay: true },
   { cat: '家务', name: '做晚饭', time: '周五/六（非爬山日）', id: 'cook', choreDay: true },
@@ -380,8 +381,8 @@ function getStorage(key) {
 }
 
 const TASK_NAMES = {
-  cn_read: '中文阅读', study_machine: '学习机数学', eng_words: '英语句子×2',
-  maoguo: '猫果作业', sweep: '扫地拖地', cook: '做晚饭',
+  cn_read: '中文阅读', study_machine: '学习机数学', raz_reading: 'RAZ英语阅读',
+  eng_words: '英语短句×2', maoguo: '猫果作业', sweep: '扫地拖地', cook: '做晚饭',
   wash: '洗内裤/袜子/眼镜', trash: '取包裹/扔垃圾', hiking: '爬山',
   honor_stars: '王者升星', daily_review: '当天活动总结', weekly_summary: '周学习总结'
 };
@@ -560,7 +561,7 @@ function render() {
       }
 
       if (isHiking && !paused) {
-        if (task.id === 'study_machine' || task.id === 'cn_read') {
+        if (task.id === 'study_machine' || task.id === 'cn_read' || task.id === 'raz_reading') {
           totalChecks++;
           if (checked) checkedCount++;
           html += '<td>' + cellHTML(key, task.id, checked) + '</td>';
