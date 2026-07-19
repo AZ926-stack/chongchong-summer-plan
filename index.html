@@ -53,7 +53,10 @@ tr.summary-row td.summary-reward { color: #e17055; font-size: 14px; font-weight:
 
 .review-section { margin-top: 16px; }
 .review-day { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
-.review-day h3 { font-size: 13px; color: #6c5ce7; margin-bottom: 6px; }
+.review-day h3 { font-size: 13px; color: #6c5ce7; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.review-day h3 .day-note { flex: 1; }
+.review-day h3 .day-note input { width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 3px 6px; font-size: 12px; font-family: inherit; outline: none; }
+.review-day h3 .day-note input:focus { border-color: #6c5ce7; }
 .review-prompts { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
 .review-item { display: flex; align-items: flex-start; gap: 4px; font-size: 12px; }
 .review-item .emoji { font-size: 14px; flex-shrink: 0; }
@@ -633,7 +636,7 @@ function render() {
     const key = dateKey(d);
     const rd = JSON.parse(localStorage.getItem('review_' + key) || '{}');
     reviewHtml += '<div class="review-day">' +
-      '<h3>' + (d.getMonth()+1) + '月' + d.getDate() + '日 周' + WEEKDAYS[i] + '</h3>' +
+      '<h3>' + (d.getMonth()+1) + '月' + d.getDate() + '日 周' + WEEKDAYS[i] + '<span class="day-note"><input type="text" placeholder="备注..." value="' + (localStorage.getItem('note_' + key) || '').replace(/"/g, '&quot;') + '" onblur="saveNote(\'' + key + '\',this.value)"></span></h3>' +
       '<div class="review-prompts">' +
         '<div class="review-item"><span class="emoji">📋</span><textarea placeholder="主要做了什么..." onblur="saveReview(\'' + key + '\',\'main\',this)">' + (rd.main||'') + '</textarea></div>' +
         '<div class="review-item"><span class="emoji">😊</span><textarea placeholder="最高兴的事..." onblur="saveReview(\'' + key + '\',\'happy\',this)">' + (rd.happy||'') + '</textarea></div>' +
@@ -653,6 +656,10 @@ function saveReview(dateKey, field, textarea) {
   // 把所有复盘字段合并成一段文字上传
   const allReview = Object.values(data).filter(Boolean).join(' | ');
   saveReviewToCloud(dateKey, allReview);
+}
+
+function saveNote(dateKey, val) {
+  localStorage.setItem('note_' + dateKey, val);
 }
 
 function changeWeek(delta) {
